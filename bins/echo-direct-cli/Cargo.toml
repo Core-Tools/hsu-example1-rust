@@ -1,0 +1,23 @@
+[package]
+name = "echo-direct-cli"
+version = "0.1.0"
+edition = "2021"
+description = "Echo direct communication demo (same process)"
+
+[[bin]]
+name = "echo-direct-cli"
+path = "src/main.rs"
+
+[dependencies]
+echo-domain = { path = "../../crates/echo-domain" }
+
+hsu-common = { workspace = true }
+hsu-module-management = { workspace = true }
+hsu-module-proto = { workspace = true }
+hsu-module-api = { workspace = true }
+
+tokio = { workspace = true }
+async-trait = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+

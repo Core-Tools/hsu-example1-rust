@@ -1,0 +1,20 @@
+[package]
+name = "echo-client"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# HSU framework
+hsu-common = { workspace = true }
+hsu-module-management = { workspace = true }
+
+# Echo protocol adapter (provides extension trait)
+echo-api-grpc = { path = "../echo-api-grpc" }
+
+# Async
+tokio = { workspace = true }
+async-trait = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+

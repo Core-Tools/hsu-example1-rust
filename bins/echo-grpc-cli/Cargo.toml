@@ -1,0 +1,27 @@
+[package]
+name = "echo-grpc-cli"
+version = "0.1.0"
+edition = "2021"
+description = "Echo gRPC client with service discovery"
+
+[[bin]]
+name = "echo-grpc-cli"
+path = "src/main.rs"
+
+[dependencies]
+# Client module (reusable business logic)
+echo-client = { path = "../../crates/echo-client" }
+
+# Protocol adapter (for factory registration in application layer)
+echo-api-grpc = { path = "../../crates/echo-api-grpc" }
+
+hsu-common = { workspace = true }
+hsu-module-api = { workspace = true }
+hsu-module-management = { workspace = true }
+
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+async-trait = { workspace = true }
+clap = { version = "4.4", features = ["derive"] }
+

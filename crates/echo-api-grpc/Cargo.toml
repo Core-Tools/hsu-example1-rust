@@ -1,0 +1,21 @@
+[package]
+name = "echo-api-grpc"
+version = "0.1.0"
+edition = "2021"
+description = "gRPC protocol adapters for Echo service"
+
+[dependencies]
+echo-domain = { path = "../echo-domain" }
+
+hsu-common = { workspace = true }
+hsu-module-management = { workspace = true }
+
+tokio = { workspace = true }
+async-trait = { workspace = true }
+tonic = { workspace = true }
+prost = { workspace = true }
+tracing = { workspace = true }
+
+[build-dependencies]
+tonic-build = "0.11"
+
