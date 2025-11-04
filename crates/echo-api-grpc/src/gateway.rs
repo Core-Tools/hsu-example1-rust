@@ -32,48 +32,24 @@ pub struct EchoGrpcGateway {
 }
 
 impl EchoGrpcGateway {
-    /// Connects to a remote Echo service.
+    /// Creates a gateway from an existing client.
+    ///
+    /// # Rust Learning Note
+    ///
+    /// This is the **only** way to create an `EchoGrpcGateway`.
+    /// Used by `ServiceGatewayFactory<C>` and the old `EchoGrpcGatewayFactory`.
     ///
     /// # Example
     ///
-    /// ```rust,no_run
-    /// use echo_api_grpc::EchoGrpcGateway;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let gateway = EchoGrpcGateway::connect("http://localhost:50051")
-    ///         .await
-    ///         .unwrap();
-    /// }
+    /// ```rust,ignore
+    /// let channel = tonic::transport::Channel::from_static("http://localhost:50051")
+    ///     .connect()
+    ///     .await?;
+    /// let client = EchoServiceClient::new(channel);
+    /// let gateway = EchoGrpcGateway::from_client(client);
     /// ```
-    pub async fn connect(addr: impl Into<String>) -> Result<Self> {
-        let addr = addr.into();
-        debug!("Connecting to gRPC service at: {}", addr);
-        
-        let client = EchoServiceClient::connect(addr)
-            .await
-            .map_err(|e| hsu_common::Error::Protocol(format!("Failed to connect: {}", e)))?;
-        
-        Ok(Self { client })
-    }
-
-    /// Calls the echo method on the remote service (public API).
-    ///
-    /// Note: This is now also available via the EchoService trait!
-    pub async fn echo_message(&mut self, message: String) -> Result<String> {
-        debug!("Calling remote echo: {}", message);
-        
-        let request = tonic::Request::new(EchoRequest { message });
-        
-        let response = self.client
-            .echo(request)
-            .await
-            .map_err(|e| {
-                error!("gRPC call failed: {}", e);
-                hsu_common::Error::Protocol(format!("gRPC error: {}", e))
-            })?;
-        
-        Ok(response.into_inner().message)
+    pub fn from_client(client: EchoServiceClient<Channel>) -> Self {
+        Self { client }
     }
 }
 
@@ -205,7 +181,14 @@ impl hsu_module_management::ProtocolGatewayFactory for EchoGrpcGatewayFactory {
         debug!("[EchoGrpcGatewayFactory] Creating gateway for address: {}", address);
         
         // Connect to the gRPC service
-        let gateway = EchoGrpcGateway::connect(address).await?;
+        let channel = Channel::from_shared(address.clone())
+            .map_err(|e| hsu_common::Error::Protocol(format!("Invalid address: {}", e)))?
+            .connect()
+            .await
+            .map_err(|e| hsu_common::Error::Protocol(format!("Failed to connect: {}", e)))?;
+        
+        let client = EchoServiceClient::new(channel);
+        let gateway = EchoGrpcGateway::from_client(client);
         
         debug!("[EchoGrpcGatewayFactory] ✅ Gateway created and connected");
         

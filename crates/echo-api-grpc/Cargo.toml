@@ -9,6 +9,7 @@ echo-domain = { path = "../echo-domain" }
 
 hsu-common = { workspace = true }
 hsu-module-management = { workspace = true }
+hsu-module-api = { workspace = true }
 
 tokio = { workspace = true }
 async-trait = { workspace = true }

@@ -34,8 +34,12 @@ pub mod generated {
 pub mod handler;
 pub mod gateway;
 pub mod server;
+pub mod gateways;
+pub mod direct_closure;
 
 pub use handler::EchoGrpcHandler;
 pub use gateway::{EchoGrpcGateway, EchoGrpcGatewayFactory};
 pub use server::{run_echo_grpc_server, spawn_echo_grpc_server};
+pub use gateways::{EchoServiceGateways, EchoServiceGatewaysImpl, EchoServiceHandlers, new_echo_service_gateways};
+pub use direct_closure::echo_direct_closure_enable;
 
