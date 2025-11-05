@@ -33,8 +33,8 @@
 //! - ✅ Much less boilerplate!
 
 use clap::Parser;
-use hsu_common::{ModuleID, Result};
-use hsu_module_api::{Config, ModuleConfig, RuntimeConfig, ServiceRegistryConfig, run_with_config};
+use hsu_common::{ModuleID, Protocol, Result};
+use hsu_module_api::{Config, ModuleConfig, RuntimeConfig, ServiceRegistryConfig, ProtocolServerConfig, run_with_config};
 
 use echo_server::{init_echo_server_module, EchoServerModuleConfig};
 
@@ -58,14 +58,17 @@ async fn main() -> Result<()> {
     
     init_echo_server_module(EchoServerModuleConfig::default())?;
     
-    // TODO: Add gRPC server config when protocol server support is implemented
+    // Configure runtime with gRPC protocol server
     let config = Config {
         runtime: RuntimeConfig {
             service_registry: ServiceRegistryConfig {
                 url: args.registry_url,
             },
             servers: vec![
-                // ProtocolServerConfig { protocol: Protocol::Grpc, listen_address: format!("0.0.0.0:{}", args.port) }
+                ProtocolServerConfig {
+                    protocol: Protocol::Grpc,
+                    listen_address: format!("0.0.0.0:{}", args.port),
+                },
             ],
         },
         modules: vec![
