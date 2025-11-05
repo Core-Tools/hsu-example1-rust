@@ -1,22 +1,23 @@
 [package]
-name = "echo-client"
+name = "echo-api"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 # Local crates
 echo-contract = { path = "../echo-contract" }
-echo-api = { path = "../echo-api" }
+echo-domain = { path = "../echo-domain" }
 echo-api-grpc = { path = "../echo-api-grpc" }
 
 # HSU core
 hsu-common = { workspace = true }
 hsu-module-api = { workspace = true }
-hsu-module-management = { workspace = true }
+hsu-module-proto = { workspace = true }
 
 # Async
-tokio = { workspace = true }
 async-trait = { workspace = true }
+tokio = { workspace = true }
+tonic = { workspace = true }
 
 # Logging
 tracing = { workspace = true }

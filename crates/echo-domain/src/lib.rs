@@ -26,12 +26,13 @@
 //! - ❌ Extension traits → in `echo-api-grpc`, `echo-api-http`, etc.
 //! - ❌ Protocol-specific code → in protocol adapter crates
 
-pub mod module;
+// TODO(Phase 8): Refactor module.rs to use new architecture
+// pub mod module;
 pub mod service;
 
-pub use module::EchoModule;
+// pub use module::EchoModule;
 pub use service::EchoServiceImpl;
 
-// Re-export the trait from framework for convenience
-pub use hsu_module_management::module_types::EchoService;
+// Re-export the trait from contract for convenience
+pub use echo_contract::EchoService;
 

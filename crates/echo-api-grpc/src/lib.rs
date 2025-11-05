@@ -1,30 +1,47 @@
-//! gRPC protocol adapters for Echo service.
+//! gRPC Protocol Adapters for Echo Service (Layer 3)
 //!
-//! This crate demonstrates the **Adapter Pattern** - bridging gRPC to domain logic!
+//! **⚠️ PHASE 5 REFACTORING:**  
+//! This crate now contains **ONLY** thin protocol adapters (factory functions).
 //!
-//! # Architecture Note
-//!
-//! This crate is **domain + protocol specific** (Echo + gRPC):
-//! - Contains gRPC adapters for Echo service
-//! - Contains extension traits for Go-like gateway usage
-//! - Bridges between protocol (gRPC) and domain (Echo business logic)
-//!
-//! ## What Goes Here
+//! # What's Here (Layer 3 - Protocol Adapters)
 //!
 //! 1. ✅ gRPC server adapter (`EchoGrpcHandler`)
 //! 2. ✅ gRPC client adapter (`EchoGrpcGateway`)
 //! 3. ✅ Protocol-specific code (protobuf, tonic)
+//! 4. ✅ Factory functions (thin wrappers)
 //!
-//! ## What Stays in Domain Layer
+//! # What Moved Out
 //!
-//! - ❌ Business logic (`EchoService` trait + impl) → in `echo-domain`
-//! - ❌ Domain models → in `echo-domain`
-//! - ❌ Protocol-agnostic code → in `echo-domain`
+//! ## To `echo-contract/` (Layer 3 - Contracts):
+//! - ❌ `EchoService` trait (protocol-agnostic)
+//! - ❌ `EchoServiceHandlers` struct
+//! - ❌ `EchoServiceGateways` trait
 //!
-//! ## Phase 2 Update
+//! ## To `echo-api/` (Layer 3/5 Boundary - Shared Components):
+//! - ❌ `gateways.rs` → `echo-api/src/gateways.rs` (EchoServiceGatewaysImpl)
+//! - ❌ `handlers.rs` → `echo-api/src/handlers.rs` (EchoHandlersRegistrar)
+//! - ❌ `direct_closure.rs` → `echo-api/src/direct_closure.rs`
 //!
-//! Extension traits have been removed! We now use `ServiceGatewayFactory<C>`
-//! for type-safe gateway creation without protocol matching.
+//! ## Deleted (Already in Framework):
+//! - ❌ `server.rs` (Layer 1 code - use `hsu-module-proto::GrpcProtocolServer`)
+//!
+//! # Architecture
+//!
+//! ```text
+//! Before (WRONG):
+//!     echo-api-grpc/
+//!     ├── gateway.rs      (Layer 3) ✅
+//!     ├── handler.rs      (Layer 3) ✅
+//!     ├── server.rs       (Layer 1) ❌ WRONG LAYER!
+//!     ├── gateways.rs     (Layer 5) ❌ WRONG LAYER!
+//!     ├── handlers.rs     (Layer 5) ❌ WRONG LAYER!
+//!     └── direct_closure.rs (Layer 5) ❌ WRONG LAYER!
+//!
+//! After (CORRECT):
+//!     echo-api-grpc/
+//!     ├── gateway.rs      (Layer 3) ✅ Thin adapter
+//!     └── handler.rs      (Layer 3) ✅ Thin adapter
+//! ```
 
 pub mod generated {
     //! Generated gRPC code from protobuf.
@@ -33,13 +50,7 @@ pub mod generated {
 
 pub mod handler;
 pub mod gateway;
-pub mod server;
-pub mod gateways;
-pub mod direct_closure;
 
 pub use handler::EchoGrpcHandler;
 pub use gateway::{EchoGrpcGateway, EchoGrpcGatewayFactory};
-pub use server::{run_echo_grpc_server, spawn_echo_grpc_server};
-pub use gateways::{EchoServiceGateways, EchoServiceGatewaysImpl, EchoServiceHandlers, new_echo_service_gateways};
-pub use direct_closure::echo_direct_closure_enable;
 

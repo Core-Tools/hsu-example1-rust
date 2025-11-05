@@ -1,7 +1,10 @@
 [workspace]
 members = [
     "crates/echo-domain",
+    "crates/echo-contract",
+    "crates/echo-api",
     "crates/echo-api-grpc",
+    "crates/echo-server",
     "crates/echo-client",
     "bins/echo-direct-cli",
     "bins/echo-grpc-srv",
@@ -34,4 +37,3 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 opt-level = 3
 lto = true
 codegen-units = 1
-

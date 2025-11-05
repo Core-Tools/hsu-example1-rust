@@ -13,7 +13,7 @@
 
 use async_trait::async_trait;
 use hsu_common::Result;
-use hsu_module_management::module_types::EchoService;
+use echo_contract::EchoService;
 use tracing::debug;
 
 /// Echo service implementation.
@@ -22,7 +22,7 @@ use tracing::debug;
 ///
 /// ```rust
 /// use echo_domain::EchoServiceImpl;
-/// use hsu_module_management::module_types::EchoService;
+/// use echo_contract::EchoService;
 ///
 /// #[tokio::main]
 /// async fn main() {

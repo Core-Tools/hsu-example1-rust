@@ -22,8 +22,9 @@ use tonic::{Request, Response, Status};
 use std::sync::Arc;
 use tracing::{debug, error};
 
+use echo_contract::EchoService;
+#[cfg(test)]
 use echo_domain::EchoServiceImpl;
-use hsu_module_management::module_types::EchoService;
 use crate::generated::{EchoRequest, EchoResponse, echo_service_server::EchoService as EchoServiceTrait};
 
 /// gRPC handler adapter for Echo service.
@@ -57,12 +58,15 @@ use crate::generated::{EchoRequest, EchoResponse, echo_service_server::EchoServi
 /// - gRPC layer: Protocol details
 /// - Domain layer: Business logic
 pub struct EchoGrpcHandler {
-    service: Arc<EchoServiceImpl>,
+    service: Arc<dyn EchoService>,
 }
 
 impl EchoGrpcHandler {
     /// Creates a new gRPC handler.
-    pub fn new(service: Arc<EchoServiceImpl>) -> Self {
+    ///
+    /// Accepts any implementation of `EchoService` trait, enabling
+    /// flexibility in the visitor pattern and handler registration.
+    pub fn new(service: Arc<dyn EchoService>) -> Self {
         Self { service }
     }
 }

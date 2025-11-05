@@ -6,10 +6,12 @@ description = "gRPC protocol adapters for Echo service"
 
 [dependencies]
 echo-domain = { path = "../echo-domain" }
+echo-contract = { path = "../echo-contract" }
 
 hsu-common = { workspace = true }
 hsu-module-management = { workspace = true }
 hsu-module-api = { workspace = true }
+hsu-module-proto = { workspace = true }
 
 tokio = { workspace = true }
 async-trait = { workspace = true }

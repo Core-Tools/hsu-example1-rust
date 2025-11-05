@@ -1,0 +1,9 @@
+[package]
+name = "echo-contract"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+hsu-common = { path = "../../../hsu-core/rust/crates/hsu-common" }
+async-trait = { workspace = true }
+

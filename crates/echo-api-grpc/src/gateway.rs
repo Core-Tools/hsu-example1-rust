@@ -9,7 +9,7 @@ use tonic::transport::Channel;
 use tracing::{debug, error};
 
 use hsu_common::Result;
-use hsu_module_management::module_types::EchoService;
+use echo_contract::EchoService;
 use crate::generated::{EchoRequest, echo_service_client::EchoServiceClient};
 
 /// gRPC gateway for calling remote Echo service.
@@ -160,47 +160,8 @@ impl Default for EchoGrpcGatewayFactory {
     }
 }
 
-#[async_trait]
-impl hsu_module_management::ProtocolGatewayFactory for EchoGrpcGatewayFactory {
-    /// Creates an EchoGrpcGateway connected to the given address.
-    ///
-    /// # Rust Learning Note
-    ///
-    /// This is the key method that the framework calls!
-    ///
-    /// **Flow:**
-    /// 1. Framework discovers service address from registry
-    /// 2. Framework calls `factory.create_gateway(address)`
-    /// 3. Factory creates EchoGrpcGateway and connects
-    /// 4. Factory wraps in ServiceGateway::Grpc enum
-    /// 5. Framework returns to user code
-    ///
-    /// **Result:** User gets a fully-functional gateway without
-    /// knowing about service discovery, connection, or wrapping!
-    async fn create_gateway(&self, address: String) -> Result<hsu_module_management::ServiceGateway> {
-        debug!("[EchoGrpcGatewayFactory] Creating gateway for address: {}", address);
-        
-        // Connect to the gRPC service
-        let channel = Channel::from_shared(address.clone())
-            .map_err(|e| hsu_common::Error::Protocol(format!("Invalid address: {}", e)))?
-            .connect()
-            .await
-            .map_err(|e| hsu_common::Error::Protocol(format!("Failed to connect: {}", e)))?;
-        
-        let client = EchoServiceClient::new(channel);
-        let gateway = EchoGrpcGateway::from_client(client);
-        
-        debug!("[EchoGrpcGatewayFactory] ✅ Gateway created and connected");
-        
-        // Wrap in the ServiceGateway enum structure
-        use hsu_module_management::module_types::GrpcGateway;
-        use std::sync::Arc;
-        
-        Ok(hsu_module_management::ServiceGateway::Grpc(
-            GrpcGateway::Echo(Arc::new(gateway))
-        ))
-    }
-}
+// DEPRECATED: Old trait implementation removed
+// Use ServiceGatewayFactory<C> pattern instead (see echo-api crate)
 
 #[cfg(test)]
 mod tests {
