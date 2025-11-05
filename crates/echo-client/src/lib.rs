@@ -23,8 +23,6 @@
 pub mod module;
 pub mod service_provider;
 
-// TODO(Phase 7): Refactor old EchoClientModule to use new architecture
-// For now, keep old implementation for compatibility
-pub use module::{init_echo_client_module, EchoClientModuleConfig};
+pub use module::{init_echo_client_module, EchoClientModuleConfig, EchoClientModule};
 pub use service_provider::EchoClientServiceProvider;
 

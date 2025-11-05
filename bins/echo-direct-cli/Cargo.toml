@@ -9,7 +9,9 @@ name = "echo-direct-cli"
 path = "src/main.rs"
 
 [dependencies]
-echo-domain = { path = "../../crates/echo-domain" }
+# Module init functions (new architecture!)
+echo-server = { path = "../../crates/echo-server" }
+echo-client = { path = "../../crates/echo-client" }
 
 hsu-common = { workspace = true }
 hsu-module-management = { workspace = true }

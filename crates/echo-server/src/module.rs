@@ -5,11 +5,20 @@
 //! This module handles initialization of the Echo server module.
 //! It registers the module with the framework and sets up wiring.
 
-use std::sync::Arc;
+use std::sync::{Arc, Once};
 use std::collections::HashMap;
+use async_trait::async_trait;
 use hsu_common::{ModuleID, Result};
-use hsu_module_api::ServiceProviderHandle;
+use hsu_module_api::{
+    ServiceProviderHandle, ServiceConnector,
+    new_module_descriptor, register_module, Module,
+};
+use hsu_module_proto::ProtocolServer;
+use echo_contract::{EchoServiceHandlers, EchoServiceGateways};
+use echo_api::{new_echo_handlers_registrar, echo_direct_closure_enable};
 use tracing::{debug, info};
+
+use crate::service_provider::EchoServerServiceProvider;
 
 /// Configuration for Echo server module.
 pub struct EchoServerModuleConfig {
@@ -29,18 +38,84 @@ impl Default for EchoServerModuleConfig {
 /// Factory function for creating the service provider.
 ///
 /// This is a **function pointer** (not a closure) to match the framework API.
+///
+/// Note: Server modules receive protocol_servers from the framework at module creation time,
+/// not at service provider creation time. So we create an empty service provider here.
 fn create_service_provider(
-    _service_connector: Arc<dyn hsu_module_api::ServiceConnector>,
+    _service_connector: Arc<dyn ServiceConnector>,
 ) -> ServiceProviderHandle {
     debug!("[EchoServerModule] Creating service provider");
     
     // For a server module, we don't provide service gateways
     // (servers provide handlers, not gateways)
     ServiceProviderHandle {
-        service_provider: Box::new(()),  // Server doesn't need a service provider for access
+        service_provider: Box::new(EchoServerServiceProvider::new(Vec::new())),
         service_gateways_map: HashMap::new(),  // No gateways provided
     }
 }
+
+/// Echo server module implementation.
+///
+/// This is the server module that provides Echo services.
+pub struct EchoServerModule {
+    id: ModuleID,
+    _service_provider: EchoServerServiceProvider,
+}
+
+impl EchoServerModule {
+    pub fn new(service_provider: EchoServerServiceProvider) -> Self {
+        Self {
+            id: ModuleID::from("echo"),  // Note: This is "echo", not "echo-server"!
+            _service_provider: service_provider,
+        }
+    }
+}
+
+#[async_trait]
+impl Module for EchoServerModule {
+    fn id(&self) -> &ModuleID {
+        &self.id
+    }
+
+    async fn start(&mut self) -> Result<()> {
+        info!("[EchoServer] Starting...");
+        // Server just needs to be ready - handlers are already registered
+        Ok(())
+    }
+
+    async fn stop(&mut self) -> Result<()> {
+        info!("[EchoServer] Stopping...");
+        Ok(())
+    }
+}
+
+/// Factory function for creating module.
+///
+/// Signature matches TypedModuleFactoryFunc<SP, SH>:
+/// fn(SP) -> (Box<dyn Module>, SH)
+fn create_module(service_provider: EchoServerServiceProvider) -> (Box<dyn Module>, EchoServiceHandlers) {
+    debug!("[EchoServerModule] Creating module");
+    
+    // Create service handlers (implementations)
+    let handlers = service_provider.create_service_handlers();
+    
+    // Create module
+    let module = EchoServerModule::new(service_provider);
+    
+    (Box::new(module), handlers)
+}
+
+/// Factory function for creating handlers registrar.
+///
+/// This is called by the framework with the protocol servers.
+fn create_handlers_registrar(
+    protocol_servers: Vec<Arc<dyn ProtocolServer>>,
+) -> Result<Box<dyn hsu_module_api::HandlersRegistrar<EchoServiceHandlers>>> {
+    debug!("[EchoServerModule] Creating handlers registrar with {} servers", protocol_servers.len());
+    new_echo_handlers_registrar(protocol_servers)
+}
+
+static INIT: Once = Once::new();
 
 /// Initializes the Echo server module.
 ///
@@ -54,23 +129,37 @@ fn create_service_provider(
 /// **Go version:**
 /// ```go
 /// func init() {
-///     moduleapi.RegisterModule(
-///         "echo-server",
-///         moduleapi.ModuleDescriptor[...]{
-///             ServiceProviderFactory: func(options) ServiceProvider {...},
-///             DirectClosureEnable: echoapi.EchoDirectClosureEnable,
-///         },
-///     )
+///     modulewiring.RegisterModule("echo", modulewiring.ModuleDescriptor[...]{
+///         ServiceProviderFactoryFunc:   NewEchoServiceProvider,
+///         ModuleFactoryFunc:            echodomain.NewEchoModule,
+///         HandlersRegistrarFactoryFunc: echoapi.NewEchoHandlersRegistrar,
+///         DirectClosureEnableFunc:      echoapi.EchoDirectClosureEnable,
+///     })
 /// }
 /// ```
 pub fn init_echo_server_module(config: EchoServerModuleConfig) -> Result<()> {
-    info!("[EchoServerModule] Initializing with config: module_id={}, grpc_port={}", 
-        config.module_id, config.grpc_port);
+    INIT.call_once(|| {
+        info!("[EchoServerModule] Initializing with config: module_id={}, grpc_port={}", 
+            config.module_id, config.grpc_port);
+        
+        // Note: SG type is Arc<dyn EchoServiceGateways> because that's how CLIENTS access this server!
+        // The SG parameter represents "gateway type used to access this module's services"
+        let descriptor = new_module_descriptor::<
+            EchoServerServiceProvider,
+            Arc<dyn EchoServiceGateways>,  // Gateway type for clients accessing this server
+            EchoServiceHandlers,            // Handler type this server provides
+        >(
+            create_service_provider,
+            create_module,
+            Some(create_handlers_registrar),  // Server provides handlers!
+            Some(echo_direct_closure_enable), // Enable direct closure!
+        );
+        
+        register_module(config.module_id.clone(), descriptor);
+        
+        info!("[EchoServerModule] ✅ Module registered successfully");
+    });
     
-    // TODO: Store config for later use when creating protocol servers
-    // For now, we just register the module descriptor
-    
-    info!("[EchoServerModule] ✅ Module initialized successfully");
     Ok(())
 }
 

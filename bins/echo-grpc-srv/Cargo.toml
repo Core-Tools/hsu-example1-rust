@@ -9,11 +9,9 @@ name = "echo-grpc-srv"
 path = "src/main.rs"
 
 [dependencies]
-echo-domain = { path = "../../crates/echo-domain" }
-echo-api-grpc = { path = "../../crates/echo-api-grpc" }
+echo-server = { path = "../../crates/echo-server" }
 
 hsu-common = { workspace = true }
-hsu-module-management = { workspace = true }
 hsu-module-api = { workspace = true }
 
 tokio = { workspace = true }

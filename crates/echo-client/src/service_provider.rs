@@ -33,6 +33,7 @@ use tracing::debug;
 ///     return p.gateways
 /// }
 /// ```
+#[derive(Clone)]
 pub struct EchoClientServiceProvider {
     gateways: Arc<dyn EchoServiceGateways>,
 }

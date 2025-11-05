@@ -44,6 +44,7 @@ use tracing::debug;
 /// pub struct EchoServerServiceProvider {}  // Empty like Go
 /// ```
 /// And move all logic to standalone functions in the descriptor.
+#[derive(Clone)]
 pub struct EchoServerServiceProvider {
     protocol_servers: Vec<Arc<dyn ProtocolServer>>,
 }

@@ -23,6 +23,6 @@
 pub mod module;
 pub mod service_provider;
 
-pub use module::{init_echo_server_module, EchoServerModuleConfig};
+pub use module::{init_echo_server_module, EchoServerModuleConfig, EchoServerModule};
 pub use service_provider::EchoServerServiceProvider;
 

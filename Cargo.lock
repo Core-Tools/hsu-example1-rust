@@ -295,7 +295,8 @@ name = "echo-direct-cli"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "echo-domain",
+ "echo-client",
+ "echo-server",
  "hsu-common",
  "hsu-module-api",
  "hsu-module-management",
@@ -338,11 +339,9 @@ name = "echo-grpc-srv"
 version = "0.1.0"
 dependencies = [
  "clap",
- "echo-api-grpc",
- "echo-domain",
+ "echo-server",
  "hsu-common",
  "hsu-module-api",
- "hsu-module-management",
  "tokio",
  "tonic",
  "tracing",

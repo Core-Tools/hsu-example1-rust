@@ -5,10 +5,14 @@
 //! This module handles initialization of the Echo client module.
 //! It registers the module with the framework and sets up wiring.
 
-use std::sync::Arc;
+use std::sync::{Arc, Once};
 use std::collections::HashMap;
+use async_trait::async_trait;
 use hsu_common::{ModuleID, Result};
-use hsu_module_api::{ServiceProviderHandle, ServiceConnector};
+use hsu_module_api::{
+    ServiceProviderHandle, ServiceConnector, 
+    new_module_descriptor, register_module, Module,
+};
 use tracing::{debug, info};
 
 use crate::service_provider::EchoClientServiceProvider;
@@ -58,6 +62,75 @@ fn create_service_provider(
     }
 }
 
+/// Echo client module implementation.
+///
+/// This is a simple module that calls the Echo service.
+/// 
+/// Now uses the NEW minimal Module trait from hsu-module-api!
+/// No more set_service_gateway_factory or service_handlers_map!
+pub struct EchoClientModule {
+    id: ModuleID,
+    service_provider: EchoClientServiceProvider,
+    message: String,
+}
+
+impl EchoClientModule {
+    pub fn new(service_provider: EchoClientServiceProvider, message: String) -> Self {
+        Self {
+            id: ModuleID::from("echo-client"),
+            service_provider,
+            message,
+        }
+    }
+}
+
+#[async_trait]
+impl Module for EchoClientModule {
+    fn id(&self) -> &ModuleID {
+        &self.id
+    }
+
+    async fn start(&mut self) -> Result<()> {
+        info!("[EchoClient] Starting...");
+        
+        // Get gateways from service provider
+        let gateways = self.service_provider.get_gateways();
+        
+        // Get service
+        let service = gateways.get_service(hsu_common::Protocol::Auto).await?;
+        
+        info!("[EchoClient] Calling echo service...");
+        let response = service.echo(self.message.clone()).await?;
+        info!("[EchoClient] Response: {}", response);
+        
+        Ok(())
+    }
+
+    async fn stop(&mut self) -> Result<()> {
+        info!("[EchoClient] Stopping...");
+        Ok(())
+    }
+}
+
+/// Factory function for creating module.
+///
+/// Signature matches TypedModuleFactoryFunc<SP, SH>:
+/// fn(SP) -> (Box<dyn Module>, SH)
+fn create_module(service_provider: EchoClientServiceProvider) -> (Box<dyn Module>, ()) {
+    debug!("[EchoClientModule] Creating module");
+    
+    let module = EchoClientModule::new(
+        service_provider,
+        "Hello from Rust client!".to_string(),
+    );
+    
+    let handlers = (); // Client doesn't provide handlers
+    
+    (Box::new(module), handlers)
+}
+
+static INIT: Once = Once::new();
+
 /// Initializes the Echo client module.
 ///
 /// This function:
@@ -79,12 +152,21 @@ fn create_service_provider(
 /// }
 /// ```
 pub fn init_echo_client_module(config: EchoClientModuleConfig) -> Result<()> {
-    info!("[EchoClientModule] Initializing with config: module_id={}", config.module_id);
+    INIT.call_once(|| {
+        info!("[EchoClientModule] Initializing with config: module_id={}", config.module_id);
+        
+        let descriptor = new_module_descriptor::<EchoClientServiceProvider, (), ()>(
+            create_service_provider,
+            create_module,
+            None, // No handlers registrar (client module)
+            None, // No direct closure enable (client module)
+        );
+        
+        register_module(config.module_id.clone(), descriptor);
+        
+        info!("[EchoClientModule] ✅ Module registered successfully");
+    });
     
-    // TODO: Store config for later use
-    // For now, we just log it
-    
-    info!("[EchoClientModule] ✅ Module initialized successfully");
     Ok(())
 }
 
