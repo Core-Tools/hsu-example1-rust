@@ -10,7 +10,7 @@ use std::sync::Arc;
 use hsu_common::Result;
 use hsu_module_api::HandlersRegistrar;
 use echo_contract::EchoServiceHandlers;
-use echo_domain::EchoServiceImpl;
+use crate::service::EchoServiceImpl;  // ← Now local!
 use echo_api::new_echo_handlers_registrar;
 use hsu_module_proto::ProtocolServer;
 use tracing::debug;

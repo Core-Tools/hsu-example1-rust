@@ -21,7 +21,7 @@ use tracing::debug;
 /// # Example
 ///
 /// ```rust
-/// use echo_domain::EchoServiceImpl;
+/// use echo_server::EchoServiceImpl;
 /// use echo_contract::EchoService;
 ///
 /// #[tokio::main]

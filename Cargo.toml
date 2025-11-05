@@ -1,6 +1,5 @@
 [workspace]
 members = [
-    "crates/echo-domain",
     "crates/echo-contract",
     "crates/echo-api",
     "crates/echo-api-grpc",

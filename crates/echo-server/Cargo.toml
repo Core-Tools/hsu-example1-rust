@@ -7,7 +7,6 @@ description = "Echo server module with wiring"
 [dependencies]
 # Local crates
 echo-contract = { path = "../echo-contract" }
-echo-domain = { path = "../echo-domain" }
 echo-api = { path = "../echo-api" }
 echo-api-grpc = { path = "../echo-api-grpc" }
 

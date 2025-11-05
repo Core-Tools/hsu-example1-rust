@@ -240,7 +240,6 @@ dependencies = [
  "async-trait",
  "echo-api-grpc",
  "echo-contract",
- "echo-domain",
  "hsu-common",
  "hsu-module-api",
  "hsu-module-proto",
@@ -255,7 +254,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "echo-contract",
- "echo-domain",
+ "echo-server",
  "hsu-common",
  "hsu-module-api",
  "hsu-module-management",
@@ -307,18 +306,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "echo-domain"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "echo-contract",
- "hsu-common",
- "hsu-module-management",
- "tokio",
- "tracing",
-]
-
-[[package]]
 name = "echo-grpc-cli"
 version = "0.1.0"
 dependencies = [
@@ -356,7 +343,6 @@ dependencies = [
  "echo-api",
  "echo-api-grpc",
  "echo-contract",
- "echo-domain",
  "hsu-common",
  "hsu-module-api",
  "hsu-module-proto",

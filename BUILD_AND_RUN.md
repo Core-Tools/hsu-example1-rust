@@ -1,20 +1,33 @@
 # Quick Build and Run Guide 🚀
 
-## TL;DR - 3 Commands to See It Work!
+## TL;DR - Quick Start!
 
 ```bash
 # 1. Build everything
 cargo build --workspace --release
 
-# 2. Run direct example (all in one!)
+# 2. Enable logging (IMPORTANT!)
+set RUST_LOG=info        # Windows
+export RUST_LOG=info     # Linux/macOS
+
+# 3. Run direct example (all in one!)
 cargo run --release --bin echo-direct-cli
 
 # Done! You just saw HSU framework in action! 🎉
+# Press Ctrl+C to stop.
 ```
+
+**Note:** Without `RUST_LOG=info`, you won't see any output!
 
 ---
 
 ## Full Demo with Service Registry
+
+**IMPORTANT:** Set logging first!
+```bash
+set RUST_LOG=info        # Windows
+export RUST_LOG=info     # Linux/macOS
+```
 
 ### Terminal 1: Service Registry
 

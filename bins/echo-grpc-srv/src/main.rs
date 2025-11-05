@@ -42,8 +42,8 @@ use echo_server::{init_echo_server_module, EchoServerModuleConfig};
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Echo gRPC Server with full HSU framework")]
 struct Args {
-    /// Port to listen on
-    #[arg(short, long, default_value = "50051")]
+    /// Port to listen on (0 = dynamic allocation)
+    #[arg(short, long, default_value = "0")]
     port: u16,
     
     /// Service registry URL

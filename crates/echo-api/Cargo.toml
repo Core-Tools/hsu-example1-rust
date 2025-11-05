@@ -6,7 +6,6 @@ edition = "2021"
 [dependencies]
 # Local crates
 echo-contract = { path = "../echo-contract" }
-echo-domain = { path = "../echo-domain" }
 echo-api-grpc = { path = "../echo-api-grpc" }
 
 # HSU core

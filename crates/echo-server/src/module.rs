@@ -30,7 +30,7 @@ impl Default for EchoServerModuleConfig {
     fn default() -> Self {
         Self {
             module_id: ModuleID::from("echo"),  // Match Golang: "echo" not "echo-server"!
-            grpc_port: 50051,
+            grpc_port: 0,
         }
     }
 }

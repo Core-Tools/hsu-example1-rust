@@ -5,7 +5,6 @@ edition = "2021"
 description = "gRPC protocol adapters for Echo service"
 
 [dependencies]
-echo-domain = { path = "../echo-domain" }
 echo-contract = { path = "../echo-contract" }
 
 hsu-common = { workspace = true }
@@ -21,4 +20,8 @@ tracing = { workspace = true }
 
 [build-dependencies]
 tonic-build = "0.11"
+
+[dev-dependencies]
+# Only for tests - adapter layer needs domain impl to test
+echo-server = { path = "../echo-server" }
 

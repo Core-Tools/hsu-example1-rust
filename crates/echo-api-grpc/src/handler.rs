@@ -24,7 +24,7 @@ use tracing::{debug, error};
 
 use echo_contract::EchoService;
 #[cfg(test)]
-use echo_domain::EchoServiceImpl;
+use echo_server::EchoServiceImpl;  // Test-only import from echo-server
 use crate::generated::{EchoRequest, EchoResponse, echo_service_server::EchoService as EchoServiceTrait};
 
 /// gRPC handler adapter for Echo service.
