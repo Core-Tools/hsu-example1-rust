@@ -57,6 +57,7 @@ use crate::generated::{EchoRequest, EchoResponse, echo_service_server::EchoServi
 /// **Separation of concerns:**
 /// - gRPC layer: Protocol details
 /// - Domain layer: Business logic
+#[derive(Clone)]
 pub struct EchoGrpcHandler {
     service: Arc<dyn EchoService>,
 }
