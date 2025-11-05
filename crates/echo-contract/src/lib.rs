@@ -30,7 +30,7 @@
 //! ```
 //!
 //! **Rust (this crate):**
-//! ```rust
+//! ```rust,ignore
 //! #[async_trait]
 //! pub trait EchoService: Send + Sync {
 //!     async fn echo(&self, message: String) -> Result<String>;
@@ -91,7 +91,7 @@ pub trait EchoService: Send + Sync {
 /// ```
 ///
 /// In Rust:
-/// ```rust
+/// ```rust,ignore
 /// pub struct EchoServiceHandlers {
 ///     pub service: Arc<dyn EchoService>,
 /// }

@@ -6,7 +6,7 @@
 //!
 //! ## Architecture
 //!
-//! ```
+//! ```text
 //! gRPC Client
 //!     ↓
 //! tonic Generated Server Trait
@@ -33,7 +33,7 @@ use crate::generated::{EchoRequest, EchoResponse, echo_service_server::EchoServi
 ///
 /// ## Adapter Pattern
 ///
-/// ```rust
+/// ```rust,ignore
 /// pub struct EchoGrpcHandler {
 ///     service: Arc<EchoServiceImpl>,  // Domain service
 /// }
@@ -80,7 +80,7 @@ impl EchoServiceTrait for EchoGrpcHandler {
     ///
     /// ## Error Conversion
     ///
-    /// ```rust
+    /// ```rust,ignore
     /// // Domain error
     /// let result = self.service.echo(message).await?;
     ///                                               ^

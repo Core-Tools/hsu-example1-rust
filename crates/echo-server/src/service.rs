@@ -60,7 +60,7 @@ impl EchoService for EchoServiceImpl {
     ///
     /// ## Async Trait Implementation
     ///
-    /// ```rust
+    /// ```rust,ignore
     /// #[async_trait]
     /// impl EchoService for EchoServiceImpl {
     ///     async fn echo(&self, message: String) -> Result<String> {

@@ -18,7 +18,7 @@ use crate::generated::{EchoRequest, echo_service_client::EchoServiceClient};
 ///
 /// ## Client Adapter
 ///
-/// ```
+/// ```text
 /// Domain Code
 ///     ↓
 /// EchoGrpcGateway (THIS ADAPTER)
@@ -126,7 +126,7 @@ impl EchoService for EchoGrpcGateway {
 /// ```
 ///
 /// **Rust version:**
-/// ```rust
+/// ```rust,ignore
 /// #[async_trait]
 /// impl ProtocolGatewayFactory for EchoGrpcGatewayFactory {
 ///     async fn create_gateway(&self, address: String) -> Result<ServiceGateway> {
