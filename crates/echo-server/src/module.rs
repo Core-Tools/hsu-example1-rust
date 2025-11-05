@@ -29,7 +29,7 @@ pub struct EchoServerModuleConfig {
 impl Default for EchoServerModuleConfig {
     fn default() -> Self {
         Self {
-            module_id: ModuleID::from("echo-server"),
+            module_id: ModuleID::from("echo"),  // Match Golang: "echo" not "echo-server"!
             grpc_port: 50051,
         }
     }
