@@ -10,12 +10,13 @@ use std::collections::HashMap;
 use async_trait::async_trait;
 use hsu_common::{ModuleID, Result};
 use hsu_module_api::{
-    ServiceProviderHandle, ServiceConnector,
-    new_module_descriptor, register_module, Module,
+    ServiceProviderHandle, ServiceConnector, 
+    ProtocolToServicesMap, HandlersRegistrarOptions,
+    new_module_descriptor, register_module, Module, 
 };
-use hsu_module_proto::ProtocolServer;
 use echo_contract::{EchoServiceHandlers, EchoServiceGateways};
-use echo_api::{new_echo_handlers_registrar, echo_direct_closure_enable};
+use crate::service::EchoServiceImpl;
+use echo_api::{new_echo_handlers_registrar, echo_direct_closure_enabler};
 use tracing::{debug, info};
 
 use crate::service_provider::EchoServerServiceProvider;
@@ -49,7 +50,7 @@ fn create_service_provider(
     // For a server module, we don't provide service gateways
     // (servers provide handlers, not gateways)
     ServiceProviderHandle {
-        service_provider: Box::new(EchoServerServiceProvider::new(Vec::new())),
+        service_provider: Box::new(EchoServerServiceProvider {}),
         service_gateways_map: HashMap::new(),  // No gateways provided
     }
 }
@@ -97,22 +98,28 @@ fn create_module(service_provider: EchoServerServiceProvider) -> (Box<dyn Module
     debug!("[EchoServerModule] Creating module");
     
     // Create service handlers (implementations)
-    let handlers = service_provider.create_service_handlers();
     
     // Create module
     let module = EchoServerModule::new(service_provider);
-    
+
+    // Create service handlers (implementations)
+    //let handlers = service_provider.create_service_handlers();
+    let handlers = EchoServiceHandlers {
+        service: Arc::new(EchoServiceImpl::new()),
+    };
+
     (Box::new(module), handlers)
 }
 
-/// Factory function for creating handlers registrar.
+/// Function for registering handlers with protocol servers.
 ///
 /// This is called by the framework with the protocol servers.
-fn create_handlers_registrar(
-    protocol_servers: Vec<Arc<dyn ProtocolServer>>,
-) -> Result<Box<dyn hsu_module_api::HandlersRegistrar<EchoServiceHandlers>>> {
-    debug!("[EchoServerModule] Creating handlers registrar with {} servers", protocol_servers.len());
-    new_echo_handlers_registrar(protocol_servers)
+fn echo_handlers_registrar(
+    options: HandlersRegistrarOptions<EchoServiceHandlers>,
+) -> Result<ProtocolToServicesMap> {
+    debug!("[EchoServerModule] Creating handlers registrar with {} servers", options.protocol_servers.len());
+    let registrar = new_echo_handlers_registrar(options.protocol_servers)?;
+    registrar.register_handlers(options.service_handlers)
 }
 
 static INIT: Once = Once::new();
@@ -151,8 +158,8 @@ pub fn init_echo_server_module(config: EchoServerModuleConfig) -> Result<()> {
         >(
             create_service_provider,
             create_module,
-            Some(create_handlers_registrar),  // Server provides handlers!
-            Some(echo_direct_closure_enable), // Enable direct closure!
+            Some(echo_handlers_registrar),  // Server provides handlers!
+            Some(echo_direct_closure_enabler), // Enable direct closure!
         );
         
         register_module(config.module_id.clone(), descriptor);

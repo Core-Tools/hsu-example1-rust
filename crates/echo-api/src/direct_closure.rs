@@ -3,7 +3,7 @@
 //! Enables direct (in-process) service calls.
 
 use std::sync::Arc;
-use hsu_module_api::DirectClosureEnableOptions;
+use hsu_module_api::DirectClosureEnablerOptions;
 use echo_contract::{EchoServiceGateways, EchoServiceHandlers};
 use tracing::debug;
 
@@ -14,8 +14,8 @@ use tracing::debug;
 ///
 /// 1. Registers with ServiceConnector
 /// 2. Stores handlers in gateways
-pub fn echo_direct_closure_enable(
-    options: DirectClosureEnableOptions<Arc<dyn EchoServiceGateways>, EchoServiceHandlers>,
+pub fn echo_direct_closure_enabler(
+    options: DirectClosureEnablerOptions<Arc<dyn EchoServiceGateways>, EchoServiceHandlers>,
 ) {
     debug!("[EchoDirectClosure] Enabling direct closure for module {}", 
         options.service_gateways.module_id());

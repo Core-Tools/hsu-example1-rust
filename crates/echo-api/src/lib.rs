@@ -28,5 +28,5 @@ pub mod direct_closure;
 
 pub use gateways::{EchoServiceGatewaysImpl, new_echo_service_gateways};
 pub use handlers::{EchoHandlersRegistrar, new_echo_handlers_registrar};
-pub use direct_closure::echo_direct_closure_enable;
+pub use direct_closure::echo_direct_closure_enabler;
 

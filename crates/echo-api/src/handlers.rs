@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::collections::HashMap;
 use async_trait::async_trait;
 use hsu_common::{Result, ServiceID, Protocol, Error};
-use hsu_module_api::{HandlersRegistrar, ProtocolToServicesMap};
+use hsu_module_api::{ProtocolToServicesMap};
 use hsu_module_proto::{ProtocolServer, ProtocolServerHandlersVisitor, grpc_server::GrpcServiceAdder};
 use echo_contract::{EchoService, EchoServiceHandlers};
 use echo_api_grpc::EchoGrpcHandler;
@@ -23,11 +23,9 @@ impl EchoHandlersRegistrar {
         debug!("Creating EchoHandlersRegistrar with {} servers", protocol_servers.len());
         Ok(Self { protocol_servers })
     }
-}
 
-impl HandlersRegistrar<EchoServiceHandlers> for EchoHandlersRegistrar {
     /// Registers Echo service handlers with all protocol servers.
-    fn register_handlers(&self, handlers: EchoServiceHandlers) -> Result<ProtocolToServicesMap> {
+    pub fn register_handlers(&self, handlers: EchoServiceHandlers) -> Result<ProtocolToServicesMap> {
         debug!("Registering Echo service handlers with {} servers", self.protocol_servers.len());
         
         let mut protocol_map: HashMap<Protocol, Vec<ServiceID>> = HashMap::new();
@@ -140,8 +138,7 @@ impl ProtocolServerHandlersVisitor for ServiceHandlersVisitor {
 /// Factory function for creating an Echo handlers registrar.
 pub fn new_echo_handlers_registrar(
     protocol_servers: Vec<Arc<dyn ProtocolServer>>,
-) -> Result<Box<dyn HandlersRegistrar<EchoServiceHandlers>>> {
+) -> Result<EchoHandlersRegistrar> {
     debug!("Creating new Echo handlers registrar");
-    Ok(Box::new(EchoHandlersRegistrar::new(protocol_servers)?))
+    Ok(EchoHandlersRegistrar::new(protocol_servers)?)
 }
-
